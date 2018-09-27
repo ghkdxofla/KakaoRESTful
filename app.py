@@ -1,5 +1,5 @@
 from flask import Flask, request
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, Api, reqparse, fields, marshal_with
 
 app = Flask(__name__)
 api = Api(app)
@@ -63,6 +63,28 @@ class Todo4(Resource):
 
 api.add_resource(Todo4,
                  '/todo4')
+
+
+resource_fields = {
+    'task': fields.String,
+    'uri': fields.Url('todo_ep')
+}
+
+
+class TodoDao(object):
+    def __init__(self, todo_id, task):
+        self.todo_id = todo_id
+        self.task = task
+        self.status = 'active'
+
+
+class Todo5(Resource):
+    @marshal_with(resource_fields)
+    def get(self, **kwargs):
+        return TodoDao(todo_id=500, task='Remember the milk')
+
+
+api.add_resource(Todo5, '/todo5')
 
 
 if __name__ == '__main__':
